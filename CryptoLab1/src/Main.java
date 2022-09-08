@@ -1,17 +1,43 @@
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         ArrayList<Character> alphabet = getRussianAlphabet();
-        PolybiusSquare polybiusSquare = new PolybiusSquare(alphabet);
-        String encrypted = polybiusSquare.encrypt("Приехал грузин из Москвы домой. Хвастается \"Был в театре, смотрел спектакль\" - Как называется? - \"Малиновая жопа\" - Не может быть! - Вспомнил! \"Вишневый зад\"!");
-        System.out.println(encrypted);
-        String decrypted = polybiusSquare.decrypt(encrypted);
-        System.out.println(decrypted);
-
+        AfinCesarEncryptor afinCesarEncryptor = new AfinCesarEncryptor(alphabet, 3, 3);
+        while (true) {
+            Scanner scanner = new Scanner(System.in);
+            String toEnc = scanner.nextLine();
+            String encrypted = afinCesarEncryptor.encrypt(toEnc);
+            System.out.println(encrypted);
+            System.out.println(afinCesarEncryptor.decrypt(encrypted));
+        }
     }
+
+    private static String readFile(String path) {
+        try(FileReader reader = new FileReader(path)){
+            int c;
+            StringBuilder stringBuilder = new StringBuilder();
+            while((c=reader.read())!=-1){
+                stringBuilder.append((char)c);
+            }
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void writeFile(String path, String data) {
+        try(FileWriter writer = new FileWriter(path)){
+            writer.write(data);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private static ArrayList<Character> getRussianAlphabet() {
         ArrayList<Character> alphabet = new ArrayList<>();
@@ -21,11 +47,6 @@ public class Main {
         alphabet.add(' ');
         alphabet.add(',');
         alphabet.add('.');
-        alphabet.add('!');
-        alphabet.add(':');
-        alphabet.add('?');
-        alphabet.add('\"');
-        alphabet.add('-');
         return alphabet;
     }
 }
