@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class AfinCesarEncryptor {
+public class AfinCesarEncryptor implements Encryptor {
 
     ArrayList<Character> alphabet;
     ArrayList<Character> encryptedAlphabet;
@@ -42,8 +42,7 @@ public class AfinCesarEncryptor {
         return a;
     }
 
-
-
+    @Override
     public String encrypt(String s) {
         char[] chars = s.toCharArray();
         StringBuilder sb = new StringBuilder();
@@ -54,7 +53,7 @@ public class AfinCesarEncryptor {
     }
 
 
-
+    @Override
     public String decrypt(String s) {
         char[] chars = s.toCharArray();
         StringBuilder sb = new StringBuilder();
