@@ -28,28 +28,21 @@ public class MagicSquareEncryptor implements Encryptor {
         char[] chars = string.toCharArray();
         StringBuilder sb = new StringBuilder();
 
-        int intBlocks = chars.length / (n * n);
-        int remainingChars = chars.length - intBlocks * n * n;
+        int intBlocks = (int)Math.ceil(chars.length * 1.0 / (n * n));
 
-        for (int i = 0; i < intBlocks; i++) {
-            char[] charSquare = new char[n * n];
-            for(int j = 0; j < n*n; j++){
-                charSquare[magicSquare.get(j) - 1] = chars[i * n + j];
+        for(int i = 0; i < intBlocks; i++){
+            int to = i * n * n + n * n;
+            if (i == intBlocks - 1){
+                to = chars.length;
             }
+            char[] subchars = Arrays.copyOfRange(chars, i * n * n, to);
+            char[] charSquare = new char[n * n];
+            for(int j = 0; j < subchars.length; j++){
+                charSquare[magicSquare.indexOf(j + 1)] = subchars[j];
+            }
+
             sb.append(charSquare);
         }
-
-        char[] charSquare = new char[n * n];
-        for(int j = 0; j < remainingChars; j++){
-            charSquare[magicSquare.get(j) - 1]
-                    = chars[intBlocks * n * n + j];
-        }
-        for(int i = 0; i < n * n; i++) {
-            if (charSquare[i] == 0)
-                charSquare[i] = ' ';
-        }
-
-        sb.append(charSquare);
         return sb.toString();
     }
 
@@ -58,28 +51,28 @@ public class MagicSquareEncryptor implements Encryptor {
         char[] chars = string.toCharArray();
         StringBuilder sb = new StringBuilder();
 
-        int intBlocks = chars.length / (n * n);
-        int remainingChars = chars.length - intBlocks * n * n;
+        int intBlocks = (int)Math.ceil(chars.length * 1.0 / (n * n));
 
-        for (int i = 0; i < intBlocks; i++) {
-            char[] charSquare = new char[n * n];
-            for(int j = 0; j < n*n; j++){
-                charSquare[magicSquare.get(j) - 1] = chars[i * n + j];
+        for(int i = 0; i < intBlocks; i++){
+            int to = i * n * n + n * n;
+            if (i == intBlocks - 1){
+                to = chars.length;
             }
-            sb.append(charSquare);
-        }
+            char[] subchars = Arrays.copyOfRange(chars, i * n * n, to);
+            char[] charSquare = new char[n * n];
+            for(int j = 0; j < subchars.length; j++){
+                charSquare[magicSquare.indexOf(j + 1)] = subchars[j];
+            }
 
-        char[] charSquare = new char[n * n];
-        for(int j = 0; j < remainingChars; j++){
-            charSquare[magicSquare.get(j) - 1] = chars[intBlocks * n * n + j];
+            int cutFrom = n * n;
+            for(int j = 0; j < n * n; j++) {
+                if (charSquare[j] == 0) {
+                    cutFrom = j;
+                    break;
+                }
+            }
+            sb.append(Arrays.copyOfRange(charSquare, 0, cutFrom));
         }
-
-        for(int i = 0; i < n * n; i++) {
-            if (charSquare[i] == 0)
-                charSquare[i] = ' ';
-        }
-
-        sb.append(charSquare);
         return sb.toString();
     }
 }

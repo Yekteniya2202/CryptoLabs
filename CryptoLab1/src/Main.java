@@ -10,6 +10,7 @@ public class Main {
         ArrayList<Character> alphabet = getRussianAlphabet();
         String[] cesarKey = readFile("src/afinCesarKey.txt").split(" ");
         String[] magicKey = readFile("src/magicSquareKey.txt").split(" ");
+        String toEncrypt = readFile("src/encrypt.txt");
 
         if (cesarKey.length != 2){
             throw new RuntimeException("cesar key not valid");
@@ -25,9 +26,21 @@ public class Main {
             key.add(Integer.parseInt(magicKey[i]));
         }
         MagicSquareEncryptor magicSquareEncryptor = new MagicSquareEncryptor(n, key);
-        String encrypted = magicSquareEncryptor.encrypt(magicSquareEncryptor.encrypt("МАГИЧЕСКАЯ СИЛА"));
-        String decrypted = magicSquareEncryptor.decrypt(magicSquareEncryptor.decrypt(encrypted));
-        System.out.println(decrypted);
+
+        System.out.println("Encypting");
+        String afinEncrypted = afinCesarEncryptor.encrypt(toEncrypt);
+        System.out.println("Afin encrypted to \"" + afinEncrypted + "\" (chech to decrypt - \"" + afinCesarEncryptor.decrypt(afinEncrypted) + "\")");
+        String magicSquareEncrypted = magicSquareEncryptor.encrypt(afinEncrypted);
+        System.out.println("Magic square encrypted to \"" + magicSquareEncrypted + "\" (chech to decrypt - \"" + magicSquareEncryptor.decrypt(magicSquareEncrypted) + "\")");
+        System.out.println("=======================");
+        System.out.println("Decrypting");
+        String magicSquareDecrypted = magicSquareEncryptor.decrypt(magicSquareEncrypted);
+        System.out.println("Magic square decrypted to \"" + magicSquareDecrypted + "\" (chech to encrypt - \"" + magicSquareEncryptor.encrypt(magicSquareDecrypted) + "\")");
+        String afinDecrypted = afinCesarEncryptor.decrypt(magicSquareDecrypted);
+        System.out.println("Afin decrypted to \"" + afinDecrypted + "\" (chech to encrypt - \"" + afinCesarEncryptor.encrypt(afinDecrypted) + "\")");
+
+        writeFile("src/decrypt.txt", afinDecrypted);
+
     }
 
     private static String readFile(String path) {
