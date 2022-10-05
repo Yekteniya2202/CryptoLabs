@@ -11,7 +11,7 @@ final class Viginer {
         alphabetSize = alphabet.size();
 
         table = new ArrayList<>();
-        int n = 9;
+        int n = alphabetSize;
         for(int i = 0; i <= n; i++){
             table.add(shiftArrayList(alphabet, i));
         }
@@ -31,52 +31,13 @@ final class Viginer {
         }
         return result;
     }
-    public String encrypt(final String text, final String key) {
-        String encrypt = "";
-        int keyLength = key.length();
-        int skip = 0;
-        String[] numsKeyArray = key.split("");
-        for(int i = 0; i < text.length(); i++){
-            int code = Integer.parseInt(numsKeyArray[(i - skip) % keyLength]);
-            char textChar = text.charAt(i);
-            if (textChar == ' '){
-                skip++;
-                encrypt += ' ';
-                continue;
-            }
-            int index = alphabet.indexOf(textChar);
-            ArrayList<Character> alphabetByCode = table.get(code);
-            encrypt += alphabetByCode.get(index);
-        }
-        return encrypt;
-    }
-
-    public String decrypt(final String text, final String key) {
-        String decrypt = "";
-        int keyLength = key.length();
-        int skip = 0;
-        String[] numsKeyArray = key.split("");
-        for(int i = 0; i < text.length(); i++){
-            int code = Integer.parseInt(numsKeyArray[(i - skip) % keyLength]);
-            char textChar = text.charAt(i);
-            if (textChar == ' '){
-                skip++;
-                decrypt += textChar;
-                continue;
-            }
-            int index = alphabet.indexOf(textChar);
-            ArrayList<Character> alphabetByCode = table.get(code);
-            decrypt += alphabet.get(alphabetByCode.indexOf(textChar));
-        }
-        return decrypt;
-    }
-
 //    public String encrypt(final String text, final String key) {
 //        String encrypt = "";
 //        int keyLength = key.length();
 //        int skip = 0;
+//        String[] numsKeyArray = key.split("");
 //        for(int i = 0; i < text.length(); i++){
-//            int code = alphabet.indexOf(key.charAt((i - skip) % keyLength));
+//            int code = Integer.parseInt(numsKeyArray[(i - skip) % keyLength]);
 //            char textChar = text.charAt(i);
 //            if (textChar == ' '){
 //                skip++;
@@ -94,8 +55,9 @@ final class Viginer {
 //        String decrypt = "";
 //        int keyLength = key.length();
 //        int skip = 0;
+//        String[] numsKeyArray = key.split("");
 //        for(int i = 0; i < text.length(); i++){
-//            int code = alphabet.indexOf(key.charAt((i - skip) % keyLength));
+//            int code = Integer.parseInt(numsKeyArray[(i - skip) % keyLength]);
 //            char textChar = text.charAt(i);
 //            if (textChar == ' '){
 //                skip++;
@@ -108,4 +70,42 @@ final class Viginer {
 //        }
 //        return decrypt;
 //    }
+
+    public String encrypt(final String text, final String key) {
+        String encrypt = "";
+        int keyLength = key.length();
+        int skip = 0;
+        for(int i = 0; i < text.length(); i++){
+            int code = alphabet.indexOf(key.charAt((i - skip) % keyLength));
+            char textChar = text.charAt(i);
+            if (textChar == ' '){
+                skip++;
+                encrypt += ' ';
+                continue;
+            }
+            int index = alphabet.indexOf(textChar);
+            ArrayList<Character> alphabetByCode = table.get(code);
+            encrypt += alphabetByCode.get(index);
+        }
+        return encrypt;
+    }
+
+    public String decrypt(final String text, final String key) {
+        String decrypt = "";
+        int keyLength = key.length();
+        int skip = 0;
+        for(int i = 0; i < text.length(); i++){
+            int code = alphabet.indexOf(key.charAt((i - skip) % keyLength));
+            char textChar = text.charAt(i);
+            if (textChar == ' '){
+                skip++;
+                decrypt += textChar;
+                continue;
+            }
+            int index = alphabet.indexOf(textChar);
+            ArrayList<Character> alphabetByCode = table.get(code);
+            decrypt += alphabet.get(alphabetByCode.indexOf(textChar));
+        }
+        return decrypt;
+    }
 }
