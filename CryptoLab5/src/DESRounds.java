@@ -15,6 +15,13 @@ public class DESRounds {
             61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7
     };
 
+    private final int[] fp = {
+            40, 8, 48, 16, 56, 24, 64, 32, 39, 7, 47, 15, 55, 23, 63, 31,
+            38, 6, 46, 14, 54, 22, 62, 30, 37, 5, 45, 13, 53, 21, 61, 29,
+            36, 4, 44, 12, 52, 20, 60, 28, 35, 3, 43, 11, 51, 19, 59, 27,
+            34, 2, 42, 10, 50, 18, 58, 26, 33, 1, 41, 9,  49, 17, 57, 25
+    };
+
     private final int[] e = {
             32, 1, 2, 3, 4, 5,
             4, 5, 6, 7, 8, 9,
@@ -92,78 +99,101 @@ public class DESRounds {
 
     //принимает 64 бита
     public DESRounds(String input) {
-        String binaryInput = convertToEightBinary(input);
+        String binaryInput = BinaryStringUtils.convertToEightBinary(input);
         if (binaryInput.length() < 64) {
             throw new RuntimeException("input binaries length < 64, binaries = " + binaryInput + "\ninput = " + input);
         }
         String ipBinaryInput = IP(binaryInput);
         binaryL = ipBinaryInput.substring(0, 32);
         binaryR = ipBinaryInput.substring(32, 64);
-        System.out.println("Binary input = " + binaryInput);
-        System.out.println("IpBinary input = " + ipBinaryInput);
-        System.out.println("L binary = " + binaryL);
-        System.out.println("R binary = " + binaryR);
+        //System.out.println("Binary input = " + binaryInput);
+        //System.out.println("IpBinary input = " + ipBinaryInput);
+        //System.out.println("L binary = " + binaryL);
+        //System.out.println("R binary = " + binaryR);
     }
 
-    public String makeRound() {
+    public void makeInverseRound(int roundNumber, String[] roundKeys) {
         if (binaryR.length() > 32) throw new RuntimeException("binaryR length > 32, binaryR = " + binaryR);
         if (binaryL.length() > 32) throw new RuntimeException("binaryL length > 32, binaryL = " + binaryL);
 
         String tmp = binaryR;
-        String fResult = f(binaryK1, binaryR);
-        System.out.println("F result = " + fResult);
-        binaryR = xorTwoStrings(fResult, binaryL);
-        System.out.println("F      " + fResult);
-        System.out.println("XOR    ");
-        System.out.println("L      " + binaryL);
-        System.out.println("equals " + binaryR);
+        String fResult = f(roundKeys[roundNumber], binaryR);
+        //System.out.println("F result = " + fResult);
+        binaryR = BinaryStringUtils.xorTwoStrings(fResult, binaryL);
+        //System.out.println("F      " + fResult);
+        //System.out.println("XOR    ");
+        //System.out.println("L      " + binaryL);
+        //System.out.println("equals " + binaryR);
         binaryL = tmp;
-        System.out.println("L binary = " + binaryL);
-        System.out.println("R binary = " + binaryR);
+        //System.out.println("L binary = " + binaryL);
+        //System.out.println("R binary = " + binaryR);
+    }
 
-        return binaryL + binaryR;
+    public void makeReverseRound(int roundNumber, String[] roundKeys) {
+        if (binaryR.length() > 32) throw new RuntimeException("binaryR length > 32, binaryR = " + binaryR);
+        if (binaryL.length() > 32) throw new RuntimeException("binaryL length > 32, binaryL = " + binaryL);
+
+        String tmp = binaryL;
+        String fResult = f(roundKeys[roundNumber], binaryL);
+        //System.out.println("F result = " + fResult);
+        binaryL = BinaryStringUtils.xorTwoStrings(fResult, binaryR);
+        //System.out.println("F      " + fResult);
+        //System.out.println("XOR    ");
+        //System.out.println("L      " + binaryL);
+        //System.out.println("equals " + binaryR);
+        binaryR = tmp;
+        //System.out.println("L binary = " + binaryL);
+        //System.out.println("R binary = " + binaryR);
+    }
+
+    public String commit(){
+        String binaryResult = FP(binaryL + binaryR);
+        String result = BinaryStringUtils.fromBinary(binaryResult);
+        //System.out.println("Rounds result binary = " + binaryResult);
+        //System.out.println("Rounds result encrypted = " + result);
+        return result;
     }
 
     public String f(String keyPart, String binaryString) {
 
-        System.out.println("32 bits = " + binaryString);
+        //System.out.println("32 bits = " + binaryString);
         String extendedBinaryString = E(binaryString);
-        System.out.println("extended to 48 bits = " + extendedBinaryString);
-        System.out.println("key = " + keyPart);
-        String xorBinaryStringWithKeyPart = xorTwoStrings(extendedBinaryString, keyPart);
-        System.out.println("xor = " + xorBinaryStringWithKeyPart);
+        //System.out.println("extended to 48 bits = " + extendedBinaryString);
+        //System.out.println("key = " + keyPart);
+        String xorBinaryStringWithKeyPart = BinaryStringUtils.xorTwoStrings(extendedBinaryString, keyPart);
+        //System.out.println("xor = " + xorBinaryStringWithKeyPart);
 
         StringBuilder sb4bits = new StringBuilder();
 
-        System.out.println("S boxes starts");
+        //System.out.println("S boxes starts");
         int boxNumber = 0;
         for (int i = 0; i < 48; i += 6) {
             String binary6Bits = xorBinaryStringWithKeyPart.substring(i, i + 6);
-            System.out.println("Taken 6 bits = " + binary6Bits);
+            //System.out.println("Taken 6 bits = " + binary6Bits);
             String outer2Bits = Character.toString(binary6Bits.charAt(0)) + Character.toString(binary6Bits.charAt(5));
-            System.out.println("Taken 2 outer bits = " + outer2Bits);
+            //System.out.println("Taken 2 outer bits = " + outer2Bits);
             String inner4Bits = binary6Bits.substring(1, 5);
-            System.out.println("Taken 4 inner bits = " + inner4Bits);
+            //System.out.println("Taken 4 inner bits = " + inner4Bits);
             int row = (int) Long.parseLong(outer2Bits, 2);
             int column = (int) Long.parseLong(inner4Bits, 2);
 
-            System.out.println("boxNumber = " + boxNumber);
-            System.out.println("row = " + row);
-            System.out.println("column = " + column);
+            //System.out.println("boxNumber = " + boxNumber);
+            //System.out.println("row = " + row);
+            //System.out.println("column = " + column);
 
             String sboxResult = Integer.toBinaryString(sBoxes[boxNumber][row][column]);
             while (sboxResult.length() < 4) {
                 sboxResult = "0" + sboxResult;
             }
-            System.out.println("sBoxResult = " + sboxResult);
+            //System.out.println("sBoxResult = " + sboxResult);
             sb4bits.append(sboxResult);
 
             boxNumber++;
         }
-        System.out.println("S boxes ends");
-        System.out.println("Result for Sbox = " + sb4bits);
+        //System.out.println("S boxes ends");
+        //System.out.println("Result for Sbox = " + sb4bits);
         String pPermuted = P(sb4bits.toString());
-        System.out.println("Permuted = " + pPermuted);
+        //System.out.println("Permuted = " + pPermuted);
         return pPermuted;
     }
 
@@ -191,33 +221,12 @@ public class DESRounds {
         return new String(ipOutput);
     }
 
-    public static String convertToEightBinary(String nonBinaryString) {
-        char[] chars = nonBinaryString.toCharArray();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < chars.length; i++) {
-            StringBuilder binariesForChar = new StringBuilder(Integer.toBinaryString((int) chars[i]));
-            while (binariesForChar.length() < 8) {
-                binariesForChar.insert(0, "0");
-            }
-            sb.append(binariesForChar);
+    public String FP(String binaryString) {
+        char[] fpOutput = new char[64];
+        for (int i = 0; i < ip.length; i++) {
+            fpOutput[i] = binaryString.charAt(fp[i] - 1);
         }
-        return sb.toString();
-    }
-
-    private static String xorTwoStrings(String first, String second) {
-        if (first.length() != second.length())
-            throw new RuntimeException("Different lengths");
-
-        List<String> firstList = Arrays.stream(first.split("")).toList();
-        List<String> secondList = Arrays.stream(second.split("")).toList();
-
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < first.length(); i++) {
-            sb.append(Integer.parseInt(firstList.get(i)) ^ Integer.parseInt(secondList.get(i)));
-        }
-
-        return sb.toString();
+        return new String(fpOutput);
     }
 
 }
