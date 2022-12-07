@@ -1,7 +1,10 @@
+import javax.swing.*;
 import java.util.Scanner;
 
-public class Main {
+public class DESApp extends JFrame {
     public static void main(String[] args) {
+
+
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter key with length = 7: ");
         String key = scanner.nextLine();
